@@ -1,15 +1,31 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const { port, host, db } = require("./configuration");
+const { connectDb } = require("./helpers/db");
 
-const port = process.env.PORT;
-const host = process.env.HOST;
-console.log("PORT", port);
 const app = express();
+
+const kittySchema = new mongoose.Schema({
+  name: String,
+});
+const Kitten = mongoose.model("Kitten", kittySchema);
 
 app.get("/test", (req, res) => {
   res.send("Our API server is working correctly");
 });
 
-app.listen(port, () => {
-  console.log(`Started API service on port ${port}`);
-  console.log(`Our host is ${host}`);
-});
+const startServer = () => {
+  app.listen(port, async () => {
+    console.log(`Started API service on port ${port}`);
+    console.log(`Our host is ${host}`);
+    console.log(`Database url ${db}`);
+    const silence = new Kitten({ name: "Silence" });
+    const savedKitten = await silence.save();
+    console.log(savedKitten);
+  });
+};
+
+connectDb()
+  .on("error", console.log)
+  .on("disconnected", connectDb)
+  .once("open", startServer);
