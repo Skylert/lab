@@ -2,6 +2,7 @@
 services:
   api:
     build: ./api
+    container_name: realworld-docker-api
     command: npm run start
     restart: unless-stopped
     ports: 
@@ -14,6 +15,7 @@ services:
       - api_db
 
   api_db:
+    container_name: realworld-docker-api-db
     image: mongo:latest
     volumes:
       - mongodb_api:/data/db
